@@ -1,9 +1,9 @@
 from redis_om import get_redis_connection
 
 params = {
-    "host": "paste_your_host",
-    "port": "paste_your_port",
-    "password": "paste_your_password",
+    "host": "redis-12538.crce182.ap-south-1-1.ec2.redns.redis-cloud.com",
+    "port": 12538,
+    "password": "VyuFwaizfSL04uuWlWn3ch3xdDNoPsCz",
     "decode_responses": True,
 }
 
