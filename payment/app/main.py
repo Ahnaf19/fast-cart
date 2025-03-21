@@ -1,5 +1,6 @@
-from app.routes.route import router
 from fastapi import FastAPI
+
+from payment.app.routes.route import router
 
 # Create an instance of the FastAPI application
 app = FastAPI()
