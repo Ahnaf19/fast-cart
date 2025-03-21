@@ -7,3 +7,4 @@ loguru==0.7.3
 mypy==1.15.0
 pre-commit==4.2.0
 uvicorn==0.34.0
+redis-om==0.3.3
