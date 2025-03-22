@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from redis_om import HashModel
 
 from inventory.app.db.redis import redis_db
@@ -21,6 +21,8 @@ class Product(HashModel):
     name: str
     price: float
     quantity: int
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     class Meta:
         # This is the Redis connection
