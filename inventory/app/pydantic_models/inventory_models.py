@@ -3,6 +3,11 @@ from redis_om import HashModel
 
 from inventory.app.db.redis import redis_db
 
+# from loguru import logger
+
+
+# logger.debug(f"Redis Connection Params in FastAPI: {redis_db.connection_pool.connection_kwargs}")
+
 
 class ResponseModel(BaseModel):
     """

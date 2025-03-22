@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+from loguru import logger
 from redis_om import get_redis_connection
 
 load_dotenv()
@@ -16,8 +17,16 @@ params = {
     "password": REDIS_PASSWORD,
     "decode_responses": True,
 }
+logger.debug(
+    f"""
+             Redis Connection Params in FastAPI:
+             REDIS_HOST: {REDIS_HOST}
+             REDIS_PORT: {REDIS_PORT}
+             """
+)
 
 redis_db = get_redis_connection(**params)
+# logger.debug(f"Redis Connection Params in FastAPI: {redis_db.connection_pool.connection_kwargs}")
 
 if __name__ == "__main__":
     load_dotenv()
@@ -36,5 +45,6 @@ if __name__ == "__main__":
     print(params)
 
     redis_db = get_redis_connection(**params)
+    # logger.debug(f"Redis Connection Params in FastAPI: {redis_db.connection_pool.connection_kwargs}")
 
     print(redis_db.ping())
