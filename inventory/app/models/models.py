@@ -19,6 +19,16 @@ class Product(HashModel):
         # for each product it will store a hash in Redis
         database = redis_db
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "New Product",
+                "price": 34.99,
+                "quantity": 30,
+                "creation_time": "2023-10-01T12:00:00",
+            }
+        }
+
 
 class UpdateProduct(BaseModel):
     name: Optional[str] = None
