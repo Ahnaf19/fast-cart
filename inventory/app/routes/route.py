@@ -26,7 +26,7 @@ def get_product(pk: str):
     """
     Get a product by its primary key (pk).
     """
-    return inventory_service.get_product(pk)
+    return inventory_service.get_product_by_pk(pk)
 
 
 @router.post("/products")
@@ -36,3 +36,11 @@ def add_product(product: Product):
     """
     # return product.save()
     return inventory_service.add_product(product)
+
+
+@router.delete("/products/{pk}")
+def delete_product(pk: str):
+    """
+    Delete a product by its primary key (pk).
+    """
+    return inventory_service.delete_product_by_pk(pk)

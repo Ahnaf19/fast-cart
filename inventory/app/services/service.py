@@ -39,11 +39,22 @@ class Service(Product):
         """
         logger.debug(product)  # Debugging the serialized data
 
-        # Save the actual product (not the dictionary) to Redis
+        # Save the actual product to Redis
         return product.save()
 
-    def get_product(self, pk: str):
+    def get_product_by_pk(self, pk: str):
         """
         Get a product by its primary key (pk).
         """
         return self.product_format(pk)
+
+    def delete_product_by_pk(self, pk: str):
+        """
+        Delete a product by its primary key (pk).
+        """
+        product = Product.get(pk)
+        product_dict = product.dict()
+
+        Product.delete(product.pk)
+
+        return product_dict
