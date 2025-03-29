@@ -1,6 +1,6 @@
 from loguru import logger
 
-from inventory.app.pydantic_models.inventory_models import Product
+from inventory.app.models.models import Product
 
 
 class Service(Product):

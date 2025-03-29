@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from inventory.app.pydantic_models.inventory_models import Product
+from inventory.app.models.models import Product
 from inventory.app.services.service import Service
 
 # Initialize the router with a prefix and tags
