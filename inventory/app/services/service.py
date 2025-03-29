@@ -1,6 +1,6 @@
 from loguru import logger
 
-from inventory.app.models.models import Product
+from inventory.app.models.models import Product, UpdateProduct
 
 
 class Service(Product):
@@ -47,6 +47,21 @@ class Service(Product):
         Get a product by its primary key (pk).
         """
         return self.product_format(pk)
+
+    def update_product_by_pk(self, pk: str, update_product: UpdateProduct):
+        """
+        Update a product by its primary key (pk).
+        """
+        product = Product.get(pk)
+        # product.name = update_product.name
+        # product.price = update_product.price
+        # product.quantity = update_product.quantity
+
+        update_data = update_product.dict(exclude_unset=True)
+
+        product.update(**update_data)
+
+        return product.save()
 
     def delete_product_by_pk(self, pk: str):
         """

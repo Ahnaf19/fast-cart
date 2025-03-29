@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from inventory.app.models.models import Product
+from inventory.app.models.models import Product, UpdateProduct
 from inventory.app.services.service import Service
 
 # Initialize the router with a prefix and tags
@@ -21,7 +21,7 @@ def get_all_products():
     return inventory_service.get_all_products()
 
 
-@router.get("/products/{pk}")
+@router.get("/product/{pk}")
 def get_product(pk: str):
     """
     Get a product by its primary key (pk).
@@ -29,7 +29,7 @@ def get_product(pk: str):
     return inventory_service.get_product_by_pk(pk)
 
 
-@router.post("/products")
+@router.post("/product")
 def add_product(product: Product):
     """
     Add a product to the database
@@ -38,7 +38,15 @@ def add_product(product: Product):
     return inventory_service.add_product(product)
 
 
-@router.delete("/products/{pk}")
+@router.put("/product/{pk}")
+def update_product(pk: str, update_product: UpdateProduct):
+    """
+    Update a product by its primary key (pk).
+    """
+    return inventory_service.update_product_by_pk(pk, update_product)
+
+
+@router.delete("/product/{pk}")
 def delete_product(pk: str):
     """
     Delete a product by its primary key (pk).

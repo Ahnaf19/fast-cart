@@ -8,7 +8,7 @@ load_dotenv()
 
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
-# weirdly .env stores int as str
+# weirdly .env stores/reads int as str
 REDIS_PORT = int(os.getenv("REDIS_PORT", 12538))
 
 params = {
