@@ -18,18 +18,31 @@ class Service(Product):
         """
         Get all products from the database
         """
-        return self.all_pks()
+        # return Product.all_pks()
+        return [self.product_format(pk) for pk in Product.all_pks()]
+
+    def product_format(self, pk: str):
+        product = Product.get(pk)
+
+        return {
+            "id": product.pk,
+            "name": product.name,
+            "price": product.price,
+            "quantity": product.quantity,
+            "creation_time": product.creation_time,
+        }
 
     def add_product(self, product: Product):
         """
         Add a product to the database
         """
-        # Convert to a dictionary (this is for inspection, not saving)
-        # product_dict = product.dict()
-        logger.debug(product)  # Debugging the serialized data
+        # logger.debug(product)  # Debugging the serialized data
 
         # Save the actual product (not the dictionary) to Redis
-        product.save()
+        return product.save()
 
-        # Return the product id
-        return {"product_id": product.pk}
+    def get_product(self, pk: str):
+        """
+        Get a product by its primary key (pk).
+        """
+        return self.product_format(pk)

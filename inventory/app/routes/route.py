@@ -21,9 +21,18 @@ def get_all_products():
     return inventory_service.get_all_products()
 
 
+@router.get("/products/{pk}")
+def get_product(pk: str):
+    """
+    Get a product by its primary key (pk).
+    """
+    return inventory_service.get_product(pk)
+
+
 @router.post("/products")
 def add_product(product: Product):
     """
     Add a product to the database
     """
+    # return product.save()
     return inventory_service.add_product(product)

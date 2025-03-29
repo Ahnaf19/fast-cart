@@ -26,7 +26,9 @@ logger.debug(
 )
 
 redis_db = get_redis_connection(**params)
+logger.debug(f"check redis ping: {redis_db.ping()}")
 # logger.debug(f"Redis Connection Params in FastAPI: {redis_db.connection_pool.connection_kwargs}")
+
 
 if __name__ == "__main__":
     load_dotenv()

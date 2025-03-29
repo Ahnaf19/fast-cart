@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+
+from pydantic import BaseModel
 from redis_om import HashModel
 
 from inventory.app.db.redis import redis_db
@@ -21,8 +23,7 @@ class Product(HashModel):
     name: str
     price: float
     quantity: int
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    creation_time: str = datetime.now().isoformat()  # Store timestamp as ISO 8601 string
 
     class Meta:
         # This is the Redis connection
