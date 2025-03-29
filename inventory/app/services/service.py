@@ -21,7 +21,8 @@ class Service(Product):
         # return Product.all_pks()
         return [self.product_format(pk) for pk in Product.all_pks()]
 
-    def product_format(self, pk: str):
+    @staticmethod
+    def product_format(pk: str):
         product = Product.get(pk)
 
         return {
@@ -29,14 +30,14 @@ class Service(Product):
             "name": product.name,
             "price": product.price,
             "quantity": product.quantity,
-            "creation_time": product.creation_time,
+            "creation_time": product.creation_time if product.creation_time else None,
         }
 
     def add_product(self, product: Product):
         """
         Add a product to the database
         """
-        # logger.debug(product)  # Debugging the serialized data
+        logger.debug(product)  # Debugging the serialized data
 
         # Save the actual product (not the dictionary) to Redis
         return product.save()

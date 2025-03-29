@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from redis_om import HashModel
 
 from inventory.app.db.redis import redis_db
@@ -23,7 +23,8 @@ class Product(HashModel):
     name: str
     price: float
     quantity: int
-    creation_time: str = datetime.now().isoformat()  # Store timestamp as ISO 8601 string
+    # Store timestamp as ISO 8601 string
+    creation_time: str = Field(default_factory=lambda: datetime.now().isoformat())
 
     class Meta:
         # This is the Redis connection
