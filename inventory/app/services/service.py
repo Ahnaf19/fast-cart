@@ -1,3 +1,5 @@
+from fastapi_cache import FastAPICache
+from fastapi_cache.decorator import cache
 from loguru import logger
 
 from inventory.app.models.models import Product, UpdateProduct
@@ -14,7 +16,8 @@ class Service(Product):
         """
         logger.debug("Service initialized")
 
-    def get_all_products(self) -> list[dict[str, str | float | int]]:
+    @cache(namespace="products", expire=600)  # Cache for 10 mins
+    async def get_all_products(self) -> list[dict[str, str | float | int]]:
         """
         Get all products from the database
         """
@@ -33,14 +36,18 @@ class Service(Product):
             "creation_time": product.creation_time,
         }
 
-    def add_product(self, product: Product) -> Product:
+    async def add_product(self, product: Product) -> Product:
         """
         Add a product to the database
         """
         logger.debug(product)  # Debugging the serialized data
 
         # Save the actual product to Redis
-        return product.save()
+        product.save()
+
+        await FastAPICache.clear(namespace="products")
+
+        return product
 
     def get_product_by_pk(self, pk: str) -> dict[str, str | float | int]:
         """
@@ -59,7 +66,7 @@ class Service(Product):
 
         return product.save()
 
-    def delete_product_by_pk(self, pk: str) -> dict[str, str | float | int]:
+    async def delete_product_by_pk(self, pk: str) -> dict[str, str | float | int]:
         """
         Delete a product by its primary key (pk).
         """
@@ -67,5 +74,8 @@ class Service(Product):
         product_dict = product.dict()
 
         Product.delete(product.pk)
+
+        # After deleting, clear the cache for this product in products namespace
+        await FastAPICache.clear(namespace="products")
 
         return product_dict

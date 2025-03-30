@@ -14,11 +14,14 @@ inventory_service = Service()
 
 
 @router.get("/products", response_model=list[dict[str, str | float | int]])
-def get_all_products() -> list[dict[str, str | float | int]]:
+async def get_all_products() -> list[dict[str, str | float | int]]:
     """
     Get all products from the database
     """
-    return inventory_service.get_all_products()
+    products = await inventory_service.get_all_products()
+    if isinstance(products, list):
+        return list(products)
+    raise TypeError("Expected a list of products, but got a non-iterable response.")
 
 
 @router.get("/product/{pk}", response_model=dict[str, str | float | int])
@@ -30,11 +33,11 @@ def get_product(pk: str) -> dict[str, str | float | int]:
 
 
 @router.post("/product", response_model=Product)
-def add_product(product: Product) -> Product:
+async def add_product(product: Product) -> Product:
     """
     Add a product to the database
     """
-    return inventory_service.add_product(product)
+    return await inventory_service.add_product(product)
 
 
 @router.put("/product/{pk}", response_model=UpdateProduct)
@@ -46,8 +49,8 @@ def update_product(pk: str, update_product: UpdateProduct) -> Product:
 
 
 @router.delete("/product/{pk}", response_model=dict[str, str | float | int])
-def delete_product(pk: str) -> dict[str, str | float | int]:
+async def delete_product(pk: str) -> dict[str, str | float | int]:
     """
     Delete a product by its primary key (pk).
     """
-    return inventory_service.delete_product_by_pk(pk)
+    return await inventory_service.delete_product_by_pk(pk)
