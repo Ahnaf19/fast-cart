@@ -1,5 +1,6 @@
 import os
 
+import redis.asyncio
 from dotenv import load_dotenv
 from loguru import logger
 from redis_om import get_redis_connection
@@ -25,8 +26,25 @@ logger.debug(
              """
 )
 
-redis_db = get_redis_connection(**params)
-logger.debug(f"check redis ping: {redis_db.ping()}")
+
+def get_redis_om_client():
+    """
+    Get the Redis client connection.
+    """
+    return get_redis_connection(**params)
+
+
+def get_redis_cache_client():
+    """
+    Get the Redis cache client connection.
+    """
+    return redis.asyncio.from_url(
+        f"redis://{REDIS_HOST}:{REDIS_PORT}", password=REDIS_PASSWORD, encoding="utf8", decode_responses=True
+    )
+
+
+# redis_db = get_redis_om_client()
+# logger.debug(f"check redis ping: {redis_db.ping()}")
 # logger.debug(f"Redis Connection Params in FastAPI: {redis_db.connection_pool.connection_kwargs}")
 
 
@@ -46,7 +64,7 @@ if __name__ == "__main__":
 
     print(params)
 
-    redis_db = get_redis_connection(**params)
+    redis_db = get_redis_om_client(**params)
     # logger.debug(f"Redis Connection Params in FastAPI: {redis_db.connection_pool.connection_kwargs}")
 
     print(redis_db.ping())
