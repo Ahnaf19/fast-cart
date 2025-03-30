@@ -4,7 +4,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from loguru import logger
 
-from inventory.app.db.redis import get_redis_cache_client, get_redis_om_client
+from inventory.app.db.redis import CustomJsonCoder, get_redis_cache_client, get_redis_om_client
 from inventory.app.models.models import Product
 from inventory.app.routes.route import router
 
@@ -24,13 +24,13 @@ async def startup_event() -> None:
     # Initialize Redis OM client for data operations
     app.state.redis = get_redis_om_client()
 
-    # Initialize Redis client for caching
+    # Initialize Redis client for caching, set coder for reading from cache
     global redis_cache
     redis_cache = get_redis_cache_client()
-    FastAPICache.init(RedisBackend(redis_cache), prefix="fastapi-cache")
+    FastAPICache.init(RedisBackend(redis_cache), prefix="fastapi-cache", coder=CustomJsonCoder)
 
     # Set model Redis database and prefix in meta
-    Product.set_meta_attr(app.state.redis, global_key_prefix="fastcart", model_key_prefix="inventory")
+    Product.set_meta_attr(app.state.redis, global_key_prefix="fastcart", model_key_prefix="inventory.Product")
 
     logger.info("Application is starting up...")
     logger.debug("Redis connection initialized and stored in app.state")

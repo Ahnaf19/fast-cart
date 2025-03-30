@@ -25,11 +25,14 @@ async def get_all_products() -> list[dict[str, str | float | int]]:
 
 
 @router.get("/product/{pk}", response_model=dict[str, str | float | int])
-def get_product(pk: str) -> dict[str, str | float | int]:
+async def get_product(pk: str) -> dict[str, str | float | int]:
     """
     Get a product by its primary key (pk).
     """
-    return inventory_service.get_product_by_pk(pk)
+    product = await inventory_service.get_product_by_pk(pk)
+    if isinstance(product, dict):
+        return product
+    raise TypeError("Expected a dictionary, but got a different response type.")
 
 
 @router.post("/product", response_model=Product)
@@ -41,11 +44,11 @@ async def add_product(product: Product) -> Product:
 
 
 @router.put("/product/{pk}", response_model=UpdateProduct)
-def update_product(pk: str, update_product: UpdateProduct) -> Product:
+async def update_product(pk: str, update_product: UpdateProduct) -> Product:
     """
     Update a product by its primary key (pk).
     """
-    return inventory_service.update_product_by_pk(pk, update_product)
+    return await inventory_service.update_product_by_pk(pk, update_product)
 
 
 @router.delete("/product/{pk}", response_model=dict[str, str | float | int])

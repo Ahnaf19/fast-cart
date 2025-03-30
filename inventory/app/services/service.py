@@ -16,16 +16,17 @@ class Service(Product):
         """
         logger.debug("Service initialized")
 
-    @cache(namespace="products", expire=600)  # Cache for 10 mins
+    @cache(namespace="inventory.products", expire=600)  # Cache for 10 mins
     async def get_all_products(self) -> list[dict[str, str | float | int]]:
         """
         Get all products from the database
         """
         # return Product.all_pks()
-        return [self.product_format(pk) for pk in Product.all_pks()]
+        return [result for pk in Product.all_pks() if isinstance((result := await self.product_format(pk)), dict)]
 
     @staticmethod
-    def product_format(pk: str) -> dict[str, str | float | int]:
+    # @cache(namespace="inventory.product", expire=120)  # Cache for 2 mins
+    async def product_format(pk: str) -> dict[str, str | float | int]:
         product = Product.get(pk)
 
         return {
@@ -40,22 +41,26 @@ class Service(Product):
         """
         Add a product to the database
         """
-        logger.debug(product)  # Debugging the serialized data
+        logger.debug(product)
 
         # Save the actual product to Redis
         product.save()
 
-        await FastAPICache.clear(namespace="products")
+        await FastAPICache.clear(namespace="inventory.products")
 
         return product
 
-    def get_product_by_pk(self, pk: str) -> dict[str, str | float | int]:
+    @cache(namespace="inventory.product", expire=600)  # Cache for 10 mins
+    async def get_product_by_pk(self, pk: str) -> dict[str, str | float | int]:
         """
         Get a product by its primary key (pk).
         """
-        return self.product_format(pk)
+        result = await self.product_format(pk)
+        if isinstance(result, dict):
+            return result
+        raise TypeError("Expected a dictionary but got a different type.")
 
-    def update_product_by_pk(self, pk: str, update_product: UpdateProduct) -> Product:
+    async def update_product_by_pk(self, pk: str, update_product: UpdateProduct) -> Product:
         """
         Update a product by its primary key (pk).
         """
@@ -64,7 +69,14 @@ class Service(Product):
 
         product.update(**update_data)
 
-        return product.save()
+        product.save()
+
+        await FastAPICache.clear(namespace="inventory.products")
+        # ! following line is clearing the cache for all products.
+        # TODO: for particular product, need to find a way to set and use the correct cache key
+        await FastAPICache.clear(namespace="inventory.product", key=pk)
+
+        return product
 
     async def delete_product_by_pk(self, pk: str) -> dict[str, str | float | int]:
         """
@@ -75,7 +87,8 @@ class Service(Product):
 
         Product.delete(product.pk)
 
-        # After deleting, clear the cache for this product in products namespace
-        await FastAPICache.clear(namespace="products")
+        # After deleting, clear the cache for this product
+        await FastAPICache.clear(namespace="inventory.products")
+        await FastAPICache.clear(namespace="inventory.product", key=pk)
 
         return product_dict
