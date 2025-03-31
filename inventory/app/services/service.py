@@ -3,6 +3,7 @@ from fastapi_cache.decorator import cache
 from loguru import logger
 
 from inventory.app.models.models import Product, UpdateProduct
+from inventory.app.services.utils import clear_cache_by_pk, product_key_builder
 
 
 class Service(Product):
@@ -50,7 +51,7 @@ class Service(Product):
 
         return product
 
-    @cache(namespace="inventory.product", expire=600)  # Cache for 10 mins
+    @cache(namespace="inventory.product", key_builder=product_key_builder, expire=600)  # Cache for 10 mins
     async def get_product_by_pk(self, pk: str) -> dict[str, str | float | int]:
         """
         Get a product by its primary key (pk).
@@ -72,9 +73,7 @@ class Service(Product):
         product.save()
 
         await FastAPICache.clear(namespace="inventory.products")
-        # ! following line is clearing the cache for all products.
-        # TODO: for particular product, need to find a way to set and use the correct cache key
-        await FastAPICache.clear(namespace="inventory.product", key=pk)
+        await clear_cache_by_pk(pk=pk, namespace="inventory.product")
 
         return product
 
@@ -89,6 +88,6 @@ class Service(Product):
 
         # After deleting, clear the cache for this product
         await FastAPICache.clear(namespace="inventory.products")
-        await FastAPICache.clear(namespace="inventory.product", key=pk)
+        await clear_cache_by_pk(pk=pk, namespace="inventory.product")
 
         return product_dict
