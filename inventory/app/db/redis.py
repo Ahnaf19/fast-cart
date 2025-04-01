@@ -93,7 +93,7 @@ if __name__ == "__main__":
         "decode_responses": True,
     }
 
-    print(params)
+    # print(params)
 
     redis_db = get_redis_om_client(**params)
     # logger.debug(f"Redis Connection Params in FastAPI: {redis_db.connection_pool.connection_kwargs}")
