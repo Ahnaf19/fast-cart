@@ -9,6 +9,6 @@ mypy==1.15.0
 pre-commit==4.2.0
 pydantic==1.10.21
 python-dotenv==1.0.1
-redis==4.6.0
+redis==5.2.1
 redis-om==0.2.2
 uvicorn==0.34.0
