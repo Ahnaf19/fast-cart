@@ -10,5 +10,5 @@ pre-commit==4.2.0
 pydantic==1.10.21
 python-dotenv==1.0.1
 redis==4.6.0
-redis-om==0.2.2
+redis-om==0.3.3
 uvicorn==0.34.0
