@@ -1,14 +1,6 @@
 bandit==1.8.3
 black==25.1.0
-fastapi==0.99.1
-fastapi-cache2[redis]==0.2.2
 flake8==7.1.2
 isort==6.0.1
-loguru==0.7.3
 mypy==1.15.0
 pre-commit==4.2.0
-pydantic==1.10.21
-python-dotenv==1.0.1
-redis==4.6.0
-redis-om==0.2.2
-uvicorn==0.34.0
