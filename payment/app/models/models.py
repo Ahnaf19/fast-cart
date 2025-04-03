@@ -6,10 +6,8 @@ from typing import Optional
 from sqlmodel import Field, SQLModel
 
 
-class Order(SQLModel):  # `table=True` makes it a database table
-    class Meta:
-        table = True
-
+class Order(SQLModel, table=True):  # type: ignore
+    # `table=True` makes it a database table
     """
     Represents an order in the system.
     """
