@@ -9,7 +9,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 # from payment.app.models.models import Order
 # * used dynamic import instead
-from payment.app.models import models
+from payment.app.models import models  # noqa: F401
 
 load_dotenv()
 
@@ -44,7 +44,7 @@ def import_models():
     Raises:
         ImportError: If a module cannot be imported.
     """
-    for _, module_name, _ in pkgutil.iter_modules(models.__path__):
+    for _, module_name, _ in pkgutil.iter_modules(["payment/app/models"]):  # Path to models directory
         importlib.import_module(f"payment.app.models.{module_name}")
 
 

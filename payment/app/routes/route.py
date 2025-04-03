@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 
 from payment.app.db.postgresql import SessionDep
-from payment.app.models.models import Order
+from payment.app.models.models import Order, UpdateOrder
 from payment.app.services.service import OrderService
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
@@ -24,21 +24,21 @@ def create_order(order: Order, session: SessionDep):
     return OrderService.create_order(order, session)
 
 
-@router.get("/{product_id}", response_model=Order)
-def get_order(product_id: str, session: SessionDep):
+@router.get("/{order_id}", response_model=Order)
+def get_order(order_id: int, session: SessionDep):
     """
-    Retrieves an order by product_id.
+    Retrieves an order by order_id.
 
     Args:
-        product_id (str): ID of the product.
+        order_id (int): ID of the order.
         session (Session): Database session.
 
     Returns:
         Order: Found order or raises HTTP 404.
     """
-    order = OrderService.get_order(product_id, session)
+    order = OrderService.get_order(order_id, session)
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
     return order
 
 
@@ -56,38 +56,38 @@ def get_all_orders(session: SessionDep):
     return OrderService.get_all_orders(session)
 
 
-@router.put("/{product_id}", response_model=Order)
-def update_order(product_id: str, updated_data: Order, session: SessionDep):
+@router.put("/{order_id}", response_model=Order)
+def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep):
     """
     Updates an existing order.
 
     Args:
-        product_id (str): ID of the product to update.
+        order_id (int): ID of the order to update.
         updated_data (Order): Updated order details.
         session (Session): Database session.
 
     Returns:
         Order: Updated order or raises HTTP 404.
     """
-    order = OrderService.update_order(product_id, updated_data, session)
+    order = OrderService.update_order(order_id, updated_data, session)
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
     return order
 
 
-@router.delete("/{product_id}", response_model=dict)
-def delete_order(product_id: str, session: SessionDep):
+@router.delete("/{order_id}", response_model=dict)
+def delete_order(order_id: int, session: SessionDep):
     """
     Deletes an order.
 
     Args:
-        product_id (str): ID of the product.
+        order_id (int): ID of the order.
         session (Session): Database session.
 
     Returns:
         dict: Confirmation message or raises HTTP 404.
     """
-    success = OrderService.delete_order(product_id, session)
-    if not success:
-        raise HTTPException(status_code=404, detail="Order not found")
-    return {"message": "Order deleted successfully"}
+    deleted_order = OrderService.delete_order(order_id, session)
+    if not deleted_order:
+        raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
+    return deleted_order
