@@ -1,34 +1,27 @@
 from typing import List
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from payment.app.db.postgresql import SessionDep
-from payment.app.models.models import Order, OrderRequest, UpdateOrder
+from payment.app.models.models import Order, UpdateOrder
 from payment.app.services.service import OrderService
 
-# import requests
-
-
-router = APIRouter(prefix="/orders", tags=["Orders"])
+router = APIRouter(prefix="/CRUD/orders", tags=["CRUD-Orders"])
 
 
 @router.post("/", response_model=Order)
-async def create_order(order_req: OrderRequest, session: SessionDep, background_tasks: BackgroundTasks):
+async def create_order(order: Order, session: SessionDep):
     """
     Creates a new order.
 
     Args:
-        order_req (OrderRequest): Order request details [order id and order quantity].
-        session (SessionDep): Database session dependency.
+        order (Order): Order details.
+        session (Session): Database session.
 
     Returns:
         Order: The newly created order.
     """
-    order = await OrderService.order_request(order_req, session)
-
-    background_tasks.add_task(OrderService.process_order, order, session)
-
-    return order
+    return await OrderService.create_order(order, session)
 
 
 @router.get("/{order_id}", response_model=Order)

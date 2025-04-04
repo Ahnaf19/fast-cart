@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from payment.app.db.postgresql import create_db_and_tables
+from payment.app.routes.CRUD_route import router as crud_router
 from payment.app.routes.route import router
 
 
@@ -18,7 +19,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(router)
+app.include_router(router)  # * main order routes
+app.include_router(crud_router)  # * reference CRUD routes
 
 
 def main() -> None:
