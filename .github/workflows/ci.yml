@@ -31,7 +31,7 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-pre-commit.txt
 
       - name: Run pre-commit checks
         run: pre-commit run --all-files
@@ -57,7 +57,8 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r inventory/requirements-dev.txt
+          pip install -r requirements.txt
+          pip install -r requirements-testing.txt
 
       - name: Run tests with pytest
         run: pytest

@@ -1,0 +1,3 @@
+-r requirements.txt
+-r requirements-pre-commit.txt
+-r requirements-testing.txt
