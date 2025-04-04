@@ -1,9 +1,10 @@
+import requests
 from fastapi import HTTPException
 from sqlalchemy import Numeric, cast, update
 from sqlmodel import select
 
 from payment.app.db.postgresql import SessionDep
-from payment.app.models.models import Order, UpdateOrder
+from payment.app.models.models import Order, OrderRequest, UpdateOrder
 
 # from loguru import logger
 
@@ -14,7 +15,43 @@ class OrderService:
     """
 
     @staticmethod
-    def create_order(order: Order, session: SessionDep) -> Order:
+    async def order_request(order_req: OrderRequest, session: SessionDep) -> Order:
+        """
+        Creates a new order request and persists it in the database.
+
+        Args:
+            order_req (OrderRequest): An object containing the details of the order request,
+                                      including order ID and quantity.
+            session (SessionDep): The database session dependency for interacting with the database.
+
+        Returns:
+            Order: The created Order object with details such as product ID, price, fee, total,
+                   quantity, and status.
+
+        Raises:
+            requests.exceptions.RequestException: If there is an issue with the HTTP request
+                                                  to the inventory service.
+            KeyError: If the expected keys are missing in the response from the inventory service."""
+
+        order_req_dict = order_req.model_dump()
+
+        req = requests.get(f"http://127.0.0.1:8000/inventory/product/{order_req_dict['order_id']}", timeout=10)
+        product = req.json()
+
+        # TODO: fix the data validation of inventorty/product/{pk} response to get rid of manual formatting
+        order = Order(
+            product_id=product["id"],
+            price=float(product["price"]),
+            fee=0.2 * float(product["price"]),
+            total=1.2 * float(product["price"]),
+            quantity=int(order_req_dict["order_quantity"]),
+            status="pending",
+        )
+
+        return await OrderService.create_order(order, session)
+
+    @staticmethod
+    async def create_order(order: Order, session: SessionDep) -> Order:
         """
         Creates a new order in the database.
 

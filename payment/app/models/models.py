@@ -3,6 +3,8 @@ import datetime
 # import uuid
 from typing import Optional
 
+import pydantic
+from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
 
@@ -72,3 +74,23 @@ class UpdateOrder(SQLModel):
                 },
             ]
         }
+
+
+class OrderRequest(BaseModel):
+    """
+    Represents a request to create an order.
+    """
+
+    order_id: str = pydantic.Field(..., description="Unique identifier for the product")
+    order_quantity: int = pydantic.Field(..., description="Quantity of the product")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "order_id": "01JQM7NFFE8CZ1H0HS7T8R3YW0",
+                    "order_quantity": 2,
+                }
+            ]
+        }
+    }
