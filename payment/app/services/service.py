@@ -40,6 +40,15 @@ class OrderService:
         req = requests.get(f"http://127.0.0.1:8000/inventory/product/{order_req_dict['order_id']}", timeout=10)
         product = req.json()
 
+        # Validate order quantity against product quantity
+        if int(order_req_dict["order_quantity"]) > int(product["quantity"]):
+            raise HTTPException(
+                status_code=400,
+                detail=f"""
+                Requested quantity ({order_req_dict['order_quantity']})
+                : exceeds available stock ({product['quantity']}).""",
+            )
+
         # TODO: fix the data validation of inventorty/product/{pk} response to get rid of manual formatting
         order = Order(
             product_id=product["id"],
