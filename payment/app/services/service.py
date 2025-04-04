@@ -1,3 +1,5 @@
+import time
+
 import requests
 from fastapi import HTTPException
 from sqlalchemy import Numeric, cast, update
@@ -42,9 +44,9 @@ class OrderService:
         order = Order(
             product_id=product["id"],
             price=float(product["price"]),
-            fee=0.2 * float(product["price"]),
-            total=1.2 * float(product["price"]),
-            quantity=int(order_req_dict["order_quantity"]),
+            fee_per_unit=0.2 * float(product["price"]),
+            total=1.2 * float(product["price"]) * int(order_req_dict["order_quantity"]),
+            order_quantity=int(order_req_dict["order_quantity"]),
             status="pending",
         )
 
@@ -64,8 +66,32 @@ class OrderService:
         """
         session.add(order)
         session.commit()
-        session.refresh(order)  # Refresh to get updated data
+        session.refresh(order)
         return order
+
+    @staticmethod
+    async def process_order(order: Order, session: SessionDep):
+        """
+        Processes an order by updating its status to 'completed'.
+
+        Args:
+            order (Order): Order object to be processed.
+            session (Session): Database session.
+
+        Returns:
+            Order: The processed order with updated status.
+        """
+        # Fetch order again from DB to attach it to the session
+        fetch_new_order = session.exec(select(Order).where(Order.order_id == order.model_dump()["order_id"])).first()
+
+        if not fetch_new_order:
+            raise ValueError("Order not found")  # Handle case where order was deleted
+
+        time.sleep(5)  # Simulate processing time
+        fetch_new_order.status = "completed"
+        session.commit()
+        session.refresh(fetch_new_order)
+        # return fetch_new_order
 
     @staticmethod
     def get_order(order_id: int, session: SessionDep) -> Order | None:

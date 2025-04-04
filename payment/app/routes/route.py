@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 
 from payment.app.db.postgresql import SessionDep
 from payment.app.models.models import Order, OrderRequest, UpdateOrder
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/orders", tags=["Orders"])
 
 
 @router.post("/", response_model=Order)
-async def create_order(order_req: OrderRequest, session: SessionDep):
+async def create_order(order_req: OrderRequest, session: SessionDep, background_tasks: BackgroundTasks):
     """
     Creates a new order.
 
@@ -24,7 +24,11 @@ async def create_order(order_req: OrderRequest, session: SessionDep):
     Returns:
         Order: The newly created order.
     """
-    return await OrderService.order_request(order_req, session)
+    order = await OrderService.order_request(order_req, session)
+
+    background_tasks.add_task(OrderService.process_order, order, session)
+
+    return order
 
 
 @router.get("/{order_id}", response_model=Order)

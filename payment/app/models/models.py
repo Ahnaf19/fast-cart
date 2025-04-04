@@ -19,9 +19,9 @@ class Order(SQLModel, table=True):  # type: ignore
     # id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True, description="Unique order ID")
     product_id: str = Field(index=True, description="Unique identifier for the product")
     price: float = Field(..., description="Price of the product")
-    fee: float = Field(..., description="Fee for the product")
+    fee_per_unit: float = Field(..., description="Fee for the product")
     total: float = Field(..., description="Total amount for the product")
-    quantity: int = Field(..., description="Quantity of the product")
+    order_quantity: int = Field(..., description="Quantity of the product")
     status: str = Field(..., description="Status of the order (e.g., pending, completed)")
     created_at: str = Field(
         default_factory=lambda: datetime.datetime.now().isoformat(), description="Timestamp when the order was created"
@@ -32,9 +32,9 @@ class Order(SQLModel, table=True):  # type: ignore
             "example": {
                 "product_id": "12345",
                 "price": 19.99,
-                "fee": 1.99,
+                "fee_per_unit": 1.99,
                 "total": 21.98,
-                "quantity": 2,
+                "order_quantity": 2,
                 "status": "pending",
             }
         }
