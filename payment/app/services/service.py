@@ -70,12 +70,12 @@ class OrderService:
             Order: The newly created order.
         """
         session.add(order)
-        session.commit()
-        session.refresh(order)
+        await session.commit()
+        await session.refresh(order)
         return order
 
     @staticmethod
-    def get_order(order_id: int, session: SessionDep) -> Order | None:
+    async def get_order(order_id: int, session: SessionDep) -> Order | None:
         """
         Retrieves an order by order_id.
 
@@ -86,10 +86,10 @@ class OrderService:
         Returns:
             Order | None: Found order or None.
         """
-        return session.get(Order, order_id)
+        return await session.get(Order, order_id)
 
     @staticmethod
-    def get_all_orders(session: SessionDep) -> list[Order]:
+    async def get_all_orders(session: SessionDep) -> list[Order]:
         """
         Retrieves all orders from the database.
 
@@ -99,10 +99,10 @@ class OrderService:
         Returns:
             list[Order]: List of all orders.
         """
-        return list(session.exec(select(Order)).all())
+        return list((await session.exec(select(Order))).all())
 
     @staticmethod
-    def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep) -> Order:
+    async def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep) -> Order:
         """
         Updates an order with new data using `update()` for efficiency.
 
@@ -122,7 +122,7 @@ class OrderService:
             raise ValueError("No fields provided for update.")
 
         # Ensure the order exists before updating
-        existing_order = session.exec(select(Order).where(Order.order_id == order_id)).first()
+        existing_order = (await session.exec(select(Order).where(Order.order_id == order_id))).first()
         if not existing_order:
             raise ValueError(f"Order with id '{order_id}' not found.")
 
@@ -133,13 +133,13 @@ class OrderService:
             .values(**update_data)
             .returning(Order)  # Return the updated row
         )
-        result = session.execute(stmt)
-        session.commit()
+        result = await session.execute(stmt)
+        await session.commit()
 
-        return result.scalar_one()  # Assumes the update succeeded
+        return await result.scalar_one()  # Assumes the update succeeded
 
     @staticmethod
-    def delete_order(order_id: int, session: SessionDep) -> dict | None:
+    async def delete_order(order_id: int, session: SessionDep) -> dict | None:
         """
         Deletes an order by order_id.
 
@@ -150,11 +150,11 @@ class OrderService:
         Returns:
             dict: order dict if found and deleted successfully, None otherwise.
         """
-        order = session.get(Order, order_id)
+        order = await session.get(Order, order_id)
         order_dict = order.model_dump() if order else None
         if not order:
             raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
 
-        session.delete(order)
-        session.commit()
+        await session.delete(order)
+        await session.commit()
         return order_dict

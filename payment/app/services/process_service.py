@@ -22,15 +22,17 @@ class ProcessService:
             Order: The processed order with updated status.
         """
         # Fetch order again from DB to attach it to the session
-        fetched_new_order = session.exec(select(Order).where(Order.order_id == order.model_dump()["order_id"])).first()
+        fetched_new_order = (
+            await session.exec(select(Order).where(Order.order_id == order.model_dump()["order_id"]))
+        ).first()
 
         if not fetched_new_order:
             raise ValueError("Order not found")  # Handle case where order was deleted
 
         time.sleep(5)  # Simulate processing time
         fetched_new_order.status = "completed"
-        session.commit()
-        session.refresh(fetched_new_order)
+        await session.commit()
+        await session.refresh(fetched_new_order)
         # return fetched_new_order
 
         # * redis stream

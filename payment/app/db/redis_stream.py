@@ -28,6 +28,6 @@ logger.debug(
 
 def get_redis_stream_client():
     """
-    Get the Redis client connection.
+    Get the Redis client connection for streaming.
     """
     return get_redis_connection(**params)

@@ -1,15 +1,12 @@
 import asyncio
 
 import redis
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 from loguru import logger
 
-from inventory.app.db.redis import CustomJsonCoder, get_redis_cache_client, get_redis_om_client
+from inventory.app.db.redis import get_redis_om_client
 from inventory.app.main import app
-from inventory.app.models.models import Product
-from inventory.app.services.stream_service import StreamService
-from inventory.app.services.utils import clear_cache_by_pk
+from payment.app.db.postgresql import get_db
+from payment.app.services.service import OrderService
 
 
 def get_redis_stream_client():
@@ -24,11 +21,11 @@ def get_redis_stream_client():
         return get_redis_om_client()  # Fallback to the default Redis connection
 
 
-async def consume_order_completed(redis_stream_client: redis.client.Redis, key: str, group: str, block_: int = 3000):
+async def consume_order_refund(redis_stream_client: redis.client.Redis, key: str, group: str, block_: int = 3000):
     """
-    Continuously listens to the Redis stream for completed order events.
+    Continuously listens to the Redis stream for refund order events.
     """
-    Product.set_meta_attr(redis_stream_client, global_key_prefix="fastcart", model_key_prefix="inventory.Product")
+    # Product.set_meta_attr(redis_stream_client, global_key_prefix="fastcart", model_key_prefix="inventory.Product")
     while True:
         try:
             # * Read new messages from Redis stream (blocking for 5 sec if no messages)
@@ -43,21 +40,21 @@ async def consume_order_completed(redis_stream_client: redis.client.Redis, key: 
             if messages != []:
                 for message in messages:
                     obj = message[1][0][1]
-                    product = Product.get(obj["product_id"])
 
-                    if product:
-                        logger.info(f"Product: {product}")
-                        logger.debug(product.key())
+                    async for session in get_db():
+                        order = await OrderService.get_order(obj["order_id"], session)
 
-                        product.quantity -= int(obj["order_quantity"])
-                        product.save()
-                        await FastAPICache.clear(namespace="inventory.products")
-                        await clear_cache_by_pk(pk=obj["product_id"], namespace="inventory.product")
+                        if order:
+                            logger.info(f"Fetched order from sql db: {order}")
 
-                        logger.info("Updated product quantity successfully")
-                    else:
-                        logger.error(f"Product with ID {obj['product_id']} not found.")
-                        StreamService.stream_order_refund(obj)
+                            order.order_status = "refunded"
+
+                            await session.commit()
+                            await session.refresh(order)
+
+                            logger.info("refunded order successfully")
+                        else:
+                            logger.error(f"order with ID {obj['order_id']} not found.")
 
         except Exception as e:
             logger.exception(f"Error consuming Redis stream: {e}")
@@ -69,13 +66,8 @@ async def consume_order_completed(redis_stream_client: redis.client.Redis, key: 
 redis_stream_client = get_redis_stream_client()
 # logger.debug(f"Redis client used in consumer: {redis_stream_client.connection_pool.connection_kwargs}")
 
-# * Initialize Redis client for caching, set coder for reading from cache
-global redis_cache
-redis_cache = get_redis_cache_client()
-FastAPICache.init(RedisBackend(redis_cache), prefix="fastapi-cache", coder=CustomJsonCoder)
-
-key = "order_completed"
-group = "inventory_group"
+key = "refund_order"
+group = "payment_group"
 
 try:
     redis_stream_client.xgroup_create(key, group)
@@ -84,7 +76,7 @@ except redis.exceptions.RedisError as e:
 
 
 async def consume():
-    await consume_order_completed(redis_stream_client, key, group)
+    await consume_order_refund(redis_stream_client, key, group)
 
 
 if __name__ == "__main__":
