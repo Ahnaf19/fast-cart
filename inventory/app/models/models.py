@@ -49,7 +49,7 @@ class Product(BaseRedisModel):
     # model_key_prefix = "inventory"
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "New Product",
                 "price": 34.99,
@@ -65,7 +65,7 @@ class UpdateProduct(BaseModel):
     quantity: Optional[int] = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "Updated Product",
                 "price": 19.99,

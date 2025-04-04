@@ -6,6 +6,7 @@ from sqlalchemy import Numeric, cast, update
 from sqlmodel import select
 
 from payment.app.db.postgresql import SessionDep
+from payment.app.db.redis_stream import get_redis_stream_client
 from payment.app.models.models import Order, OrderRequest, UpdateOrder
 
 # from loguru import logger
@@ -91,16 +92,33 @@ class OrderService:
             Order: The processed order with updated status.
         """
         # Fetch order again from DB to attach it to the session
-        fetch_new_order = session.exec(select(Order).where(Order.order_id == order.model_dump()["order_id"])).first()
+        fetched_new_order = session.exec(select(Order).where(Order.order_id == order.model_dump()["order_id"])).first()
 
-        if not fetch_new_order:
+        if not fetched_new_order:
             raise ValueError("Order not found")  # Handle case where order was deleted
 
         time.sleep(5)  # Simulate processing time
-        fetch_new_order.status = "completed"
+        fetched_new_order.status = "completed"
         session.commit()
-        session.refresh(fetch_new_order)
-        # return fetch_new_order
+        session.refresh(fetched_new_order)
+        # return fetched_new_order
+
+        # * redis stream
+        OrderService.stream_order_completed(fetched_new_order)
+
+    @staticmethod
+    def stream_order_completed(order: Order) -> None:
+        """
+        Adds a completed order to the Redis stream.
+
+        Args:
+            order (Order): Order object to be added to the stream.
+
+        Returns:
+            None
+        """
+        redis_stream = get_redis_stream_client()
+        redis_stream.xadd(name="order_completed", fields=order.model_dump(), id="*")
 
     @staticmethod
     def get_order(order_id: int, session: SessionDep) -> Order | None:
