@@ -3,7 +3,7 @@ from fastapi_cache.decorator import cache
 from loguru import logger
 
 from inventory.app.models.models import Product, UpdateProduct
-from inventory.app.services.utils import clear_cache_by_pk, product_key_builder
+from inventory.app.services.utils import clear_cache_by_pk, product_format, product_key_builder
 
 
 class Service(Product):
@@ -23,20 +23,8 @@ class Service(Product):
         Get all products from the database
         """
         # return Product.all_pks()
-        return [result for pk in Product.all_pks() if isinstance((result := await self.product_format(pk)), dict)]
-
-    @staticmethod
-    # @cache(namespace="inventory.product", expire=120)  # Cache for 2 mins
-    async def product_format(pk: str) -> dict[str, str | float | int]:
-        product = Product.get(pk)
-
-        return {
-            "id": product.pk if product.pk else "not found",
-            "name": product.name,
-            "price": product.price,
-            "quantity": product.quantity,
-            "creation_time": product.creation_time,
-        }
+        # return [result for pk in Product.all_pks() if isinstance((result := await self.product_format(pk)), dict)]
+        return [result for pk in Product.all_pks() if isinstance((result := await product_format(pk)), dict)]
 
     async def add_product(self, product: Product) -> Product:
         """
@@ -56,7 +44,7 @@ class Service(Product):
         """
         Get a product by its primary key (pk).
         """
-        result = await self.product_format(pk)
+        result = await product_format(pk)
         if isinstance(result, dict):
             return result
         raise TypeError("Expected a dictionary but got a different type.")

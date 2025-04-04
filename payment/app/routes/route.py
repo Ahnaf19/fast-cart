@@ -4,10 +4,8 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 
 from payment.app.db.postgresql import SessionDep
 from payment.app.models.models import Order, OrderRequest, UpdateOrder
+from payment.app.services.process_service import ProcessService
 from payment.app.services.service import OrderService
-
-# import requests
-
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -26,7 +24,7 @@ async def create_order(order_req: OrderRequest, session: SessionDep, background_
     """
     order = await OrderService.order_request(order_req, session)
 
-    background_tasks.add_task(OrderService.process_order, order, session)
+    background_tasks.add_task(ProcessService.process_order, order, session)
 
     return order
 

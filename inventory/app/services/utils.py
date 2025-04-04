@@ -5,6 +5,8 @@ from loguru import logger
 from starlette.requests import Request
 from starlette.responses import Response
 
+from inventory.app.models.models import Product
+
 
 def product_key_builder(
     func,
@@ -49,3 +51,16 @@ async def clear_cache_by_pk(pk: str, namespace: str = "") -> None:
 
     # https://github.com/long2ice/fastapi-cache/blob/main/fastapi_cache/backends/redis.py
     await cache_backend.clear(key=cache_key)
+
+
+# @cache(namespace="inventory.product", expire=120)  # Cache for 2 mins
+async def product_format(pk: str) -> dict[str, str | float | int]:
+    product = Product.get(pk)
+
+    return {
+        "id": product.pk if product.pk else "not found",
+        "name": product.name,
+        "price": product.price,
+        "quantity": product.quantity,
+        "creation_time": product.creation_time,
+    }
