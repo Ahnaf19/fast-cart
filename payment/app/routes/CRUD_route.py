@@ -10,7 +10,7 @@ router = APIRouter(prefix="/CRUD/orders", tags=["CRUD-Orders"])
 
 
 @router.post("/", response_model=Order)
-def create_order(order: Order, session: SessionDep):
+async def create_order(order: Order, session: SessionDep):
     """
     Creates a new order.
 
@@ -21,7 +21,7 @@ def create_order(order: Order, session: SessionDep):
     Returns:
         Order: The newly created order.
     """
-    return OrderService.create_order(order, session)
+    return await OrderService.create_order(order, session)
 
 
 @router.get("/{order_id}", response_model=Order)
