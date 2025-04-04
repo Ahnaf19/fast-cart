@@ -1,7 +1,13 @@
-# pre-commit libraries
-bandit==1.8.3
-black==25.1.0
-flake8==7.1.2
-isort==6.0.1
-mypy==1.15.0
-pre-commit==4.2.0
+fastapi==0.115.12
+fastapi-cache2[redis]==0.2.2
+loguru==0.7.3
+psycopg2==2.9.10
+pydantic==2.11.1
+python-dotenv==1.1.0
+redis==4.6.0
+redis-om==0.3.5
+requests==2.32.3
+sqlalchemy==2.0.40
+sqlmodel==0.0.24
+types-requests==2.32.0.20250328
+uvicorn==0.34.0
