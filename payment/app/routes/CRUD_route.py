@@ -6,7 +6,7 @@ from payment.app.db.postgresql import SessionDep
 from payment.app.models.models import Order, UpdateOrder
 from payment.app.services.service import OrderService
 
-router = APIRouter(prefix="/orders", tags=["Orders"])
+router = APIRouter(prefix="/CRUD/orders", tags=["CRUD-Orders"])
 
 
 @router.post("/", response_model=Order)
