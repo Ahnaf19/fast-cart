@@ -4,6 +4,7 @@ import redis
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from loguru import logger
+from redis_om.model.model import NotFoundError
 
 from inventory.app.db.redis import CustomJsonCoder, get_redis_cache_client, get_redis_om_client
 from inventory.app.main import app
@@ -44,9 +45,10 @@ async def consume_order_completed(redis_stream_client: redis.client.Redis, key: 
                 message_list = messages[0][1]
                 for message in message_list:
                     obj = message[1]
-                    product = Product.get(obj["product_id"])
 
-                    if product:
+                    try:
+                        product = Product.get(obj["product_id"])
+
                         logger.info(f"Product: {product}")
                         logger.debug(product.key())
 
@@ -55,10 +57,14 @@ async def consume_order_completed(redis_stream_client: redis.client.Redis, key: 
                         await FastAPICache.clear(namespace="inventory.products")
                         await clear_cache_by_pk(pk=obj["product_id"], namespace="inventory.product")
 
-                        logger.info("Updated product quantity successfully")
-                    else:
-                        logger.error(f"Product with ID {obj['product_id']} not found.")
+                        logger.success("Updated product quantity successfully")
+                    except NotFoundError:
+                        # logger.error(f"Product with ID {obj['product_id']} not found.")
+                        logger.warning(
+                            f"⚠️ Product not found in inventory for ID: {obj['product_id']}. Triggering refund."
+                        )
                         StreamService.stream_order_refund(obj)
+                        logger.success(f"Refund event streamed for order ID: {obj['order_id']}")
 
         except Exception as e:
             logger.exception(f"Error consuming Redis stream: {e}")

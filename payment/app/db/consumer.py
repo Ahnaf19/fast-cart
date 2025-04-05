@@ -29,19 +29,19 @@ async def consume_order_refund(redis_stream_client: redis.client.Redis, key: str
                     obj = message[1][0][1]
 
                     async for session in get_db():
-                        order = await OrderService.get_order(obj["order_id"], session)
+                        order = await OrderService.get_order(int(obj["order_id"]), session)
 
                         if order:
                             logger.info(f"Fetched order from sql db: {order}")
 
-                            order.order_status = "refunded"
+                            order.status = "refunded"
 
                             await session.commit()
                             await session.refresh(order)
 
-                            logger.info("refunded order successfully")
+                            logger.success(f"Order with ID {obj['order_id']} refunded successfully.")
                         else:
-                            logger.error(f"order with ID {obj['order_id']} not found.")
+                            logger.warning(f"Order with ID {obj['order_id']} not found in the database.")
 
         except Exception as e:
             logger.exception(f"Error consuming Redis stream: {e}")
