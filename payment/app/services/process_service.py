@@ -1,4 +1,4 @@
-import time
+import asyncio
 
 from sqlmodel import select
 
@@ -29,7 +29,7 @@ class ProcessService:
         if not fetched_new_order:
             raise ValueError("Order not found")  # Handle case where order was deleted
 
-        time.sleep(5)  # Simulate processing time
+        await asyncio.sleep(5)  # Simulate processing time
         fetched_new_order.status = "completed"
         await session.commit()
         await session.refresh(fetched_new_order)
