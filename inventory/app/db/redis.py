@@ -44,6 +44,13 @@ def get_redis_cache_client():
     )
 
 
+def get_redis_stream_client():
+    """
+    Get the Redis client connection for streaming.
+    """
+    return get_redis_connection(**params)
+
+
 class CustomJsonCoder(JsonCoder):
     """
     A custom JSON coder that extends the functionality of the JsonCoder class
