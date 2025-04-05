@@ -114,7 +114,7 @@ class OrderService:
         return list((await session.exec(select(Order))).all())
 
     @staticmethod
-    async def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep) -> Order:
+    async def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep) -> Order | None:
         """
         Updates an order with new data using `update()` for efficiency.
 
@@ -145,10 +145,12 @@ class OrderService:
             .values(**update_data)
             .returning(Order)  # Return the updated row
         )
-        result = await session.execute(stmt)
+        _ = await session.execute(stmt)
         await session.commit()
 
-        return result.scalar_one()  # Assumes the update succeeded
+        updated_order = (await session.exec(select(Order).where(Order.order_id == order_id))).first()
+
+        return updated_order
 
     @staticmethod
     async def delete_order(order_id: int, session: SessionDep) -> dict | None:
