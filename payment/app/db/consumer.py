@@ -3,22 +3,9 @@ import asyncio
 import redis
 from loguru import logger
 
-from inventory.app.db.redis import get_redis_om_client
-from inventory.app.main import app
 from payment.app.db.postgresql import get_db
+from payment.app.db.redis_stream import get_redis_stream_client
 from payment.app.services.service import OrderService
-
-
-def get_redis_stream_client():
-    """
-    Retrieves the Redis stream client initialized in the FastAPI app.
-    """
-    try:
-        logger.debug("using app.state.redis")
-        return app.state.redis  # Reuse the existing Redis connection
-    except AttributeError:
-        logger.debug("app.state.redis not found. using fresh get_redis_om_client")
-        return get_redis_om_client()  # Fallback to the default Redis connection
 
 
 async def consume_order_refund(redis_stream_client: redis.client.Redis, key: str, group: str, block_: int = 3000):

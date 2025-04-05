@@ -1,5 +1,7 @@
 import requests
 from fastapi import HTTPException
+
+# from loguru import logger
 from sqlalchemy import Numeric, cast, update
 from sqlmodel import select
 
@@ -33,7 +35,7 @@ class OrderService:
 
         order_req_dict = order_req.model_dump()
 
-        req = requests.get(f"http://127.0.0.1:8000/inventory/product/{order_req_dict['order_id']}", timeout=10)
+        req = requests.get(f"http://127.0.0.1:8000/inventory/product/{order_req_dict['product_id']}", timeout=10)
         product = req.json()
 
         # Validate order quantity against product quantity
@@ -88,6 +90,16 @@ class OrderService:
         """
         return await session.get(Order, order_id)
 
+        # * used to initiate redis stream key
+        # order = await session.get(Order, order_id)
+        # logger.debug(order)
+        # redis_stream_client = get_redis_stream_client()
+        # if order is None:
+        #     raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
+        # redis_stream_client.xadd('refund_order', order.model_dump(), id='*')
+
+        # return order
+
     @staticmethod
     async def get_all_orders(session: SessionDep) -> list[Order]:
         """
@@ -136,7 +148,7 @@ class OrderService:
         result = await session.execute(stmt)
         await session.commit()
 
-        return await result.scalar_one()  # Assumes the update succeeded
+        return result.scalar_one()  # Assumes the update succeeded
 
     @staticmethod
     async def delete_order(order_id: int, session: SessionDep) -> dict | None:

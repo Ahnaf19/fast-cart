@@ -41,8 +41,9 @@ async def consume_order_completed(redis_stream_client: redis.client.Redis, key: 
             # Process the message (e.g., update inventory, trigger further workflows)
 
             if messages != []:
-                for message in messages:
-                    obj = message[1][0][1]
+                message_list = messages[0][1]
+                for message in message_list:
+                    obj = message[1]
                     product = Product.get(obj["product_id"])
 
                     if product:

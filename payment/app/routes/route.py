@@ -30,7 +30,7 @@ async def create_order(order_req: OrderRequest, session: SessionDep, background_
 
 
 @router.get("/{order_id}", response_model=Order)
-def get_order(order_id: int, session: SessionDep):
+async def get_order(order_id: int, session: SessionDep):
     """
     Retrieves an order by order_id.
 
@@ -41,14 +41,14 @@ def get_order(order_id: int, session: SessionDep):
     Returns:
         Order: Found order or raises HTTP 404.
     """
-    order = OrderService.get_order(order_id, session)
+    order = await OrderService.get_order(order_id, session)
     if not order:
         raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
     return order
 
 
 @router.get("/", response_model=List[Order])
-def get_all_orders(session: SessionDep):
+async def get_all_orders(session: SessionDep):
     """
     Retrieves all orders.
 
@@ -58,11 +58,11 @@ def get_all_orders(session: SessionDep):
     Returns:
         List[Order]: List of all orders.
     """
-    return OrderService.get_all_orders(session)
+    return await OrderService.get_all_orders(session)
 
 
 @router.put("/{order_id}", response_model=Order)
-def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep):
+async def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep):
     """
     Updates an existing order.
 
@@ -74,14 +74,14 @@ def update_order(order_id: int, updated_data: UpdateOrder, session: SessionDep):
     Returns:
         Order: Updated order or raises HTTP 404.
     """
-    order = OrderService.update_order(order_id, updated_data, session)
+    order = await OrderService.update_order(order_id, updated_data, session)
     if not order:
         raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
     return order
 
 
 @router.delete("/{order_id}", response_model=dict)
-def delete_order(order_id: int, session: SessionDep):
+async def delete_order(order_id: int, session: SessionDep):
     """
     Deletes an order.
 
@@ -92,7 +92,7 @@ def delete_order(order_id: int, session: SessionDep):
     Returns:
         dict: Confirmation message or raises HTTP 404.
     """
-    deleted_order = OrderService.delete_order(order_id, session)
+    deleted_order = await OrderService.delete_order(order_id, session)
     if not deleted_order:
         raise HTTPException(status_code=404, detail=f"Order with id {order_id} not found")
     return deleted_order

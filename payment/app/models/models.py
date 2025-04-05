@@ -47,29 +47,36 @@ class UpdateOrder(SQLModel):
 
     product_id: Optional[str] = Field(None, description="Unique identifier for the product")
     price: Optional[float] = Field(None, description="Price of the product")
-    fee: Optional[float] = Field(None, description="Fee for the product")
+    fee_per_unit: Optional[float] = Field(None, description="Fee for the product")
     total: Optional[float] = Field(None, description="Total amount for the product")
-    quantity: Optional[int] = Field(None, description="Quantity of the product")
+    order_quantity: Optional[int] = Field(None, description="Quantity of the product")
     status: Optional[str] = Field(None, description="Status of the order (e.g., pending, completed)")
 
     class Config:
         json_schema_extra = {
             "examples": [
-                {"product_id": "101", "price": 99.99, "fee": 4.99, "total": 104.98, "quantity": 1, "status": "pending"},
+                {
+                    "product_id": "101",
+                    "price": 99.99,
+                    "fee_per_unit": 4.99,
+                    "total": 104.98,
+                    "order_quantity": 1,
+                    "status": "pending",
+                },
                 {
                     "product_id": 202,
                     "price": "50.5",  # Demonstrating conversion from string to float
-                    "fee": 2.5,
+                    "fee_per_unit": 2.5,
                     "total": 53.0,
-                    "quantity": 2,
+                    "order_quantity": 2,
                     "status": "completed",
                 },
                 {
                     "product_id": 303,
                     "price": "invalid_price",  # Invalid data example
-                    "fee": "NaN",
+                    "fee_per_unit": "NaN",
                     "total": None,
-                    "quantity": "five",
+                    "order_quantity": "five",
                     "status": "unknown",
                 },
             ]
@@ -81,14 +88,14 @@ class OrderRequest(BaseModel):
     Represents a request to create an order.
     """
 
-    order_id: str = pydantic.Field(..., description="Unique identifier for the product")
+    product_id: str = pydantic.Field(..., description="Unique identifier for the product")
     order_quantity: int = pydantic.Field(..., description="Quantity of the product")
 
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
-                    "order_id": "01JQM7NFFE8CZ1H0HS7T8R3YW0",
+                    "product_id": "01JQM7NFFE8CZ1H0HS7T8R3YW0",
                     "order_quantity": 2,
                 }
             ]

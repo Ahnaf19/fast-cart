@@ -35,6 +35,35 @@ def product_key_builder(
     raise ValueError("Cache key builder error: No primary key (pk) provided.")
 
 
+async def clear_cache_by_namespace(namespace: str) -> None:
+    """
+    Clears the cache for a specific namespace or the entire cache if the namespace is empty.
+
+    Args:
+        namespace (str): The namespace to clear from the cache. If an empty string is provided,
+                         the entire cache will be cleared.
+
+    Raises:
+        Exception: If an error occurs during the cache clearing process.
+
+    Notes:
+        This function uses the FastAPICache library to interact with the cache backend.
+        The cache key is constructed using the prefix and the provided namespace.
+    """
+    prefix = FastAPICache.get_prefix()
+    cache_backend = FastAPICache.get_backend()
+
+    if namespace == "":
+        cache_key = f"{prefix}"
+    else:
+        cache_key = f"{prefix}:{namespace}"
+
+    logger.debug(f"Clearing cache for key: {cache_key}")
+
+    # https://github.com/long2ice/fastapi-cache/blob/main/fastapi_cache/backends/redis.py
+    await cache_backend.clear(key=cache_key)
+
+
 async def clear_cache_by_pk(pk: str, namespace: str = "") -> None:
     """
     Clear the cache for a specific cache by its primary key (pk).

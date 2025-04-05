@@ -1,9 +1,14 @@
-from fastapi_cache import FastAPICache
+# from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 from loguru import logger
 
 from inventory.app.models.models import Product, UpdateProduct
-from inventory.app.services.utils import clear_cache_by_pk, product_format, product_key_builder
+from inventory.app.services.utils import (
+    clear_cache_by_namespace,
+    clear_cache_by_pk,
+    product_format,
+    product_key_builder,
+)
 
 
 class Service(Product):
@@ -35,7 +40,8 @@ class Service(Product):
         # Save the actual product to Redis
         product.save()
 
-        await FastAPICache.clear(namespace="inventory.products")
+        # await FastAPICache.clear(namespace="inventory.products")
+        await clear_cache_by_namespace(namespace="inventory.products")
 
         return product
 
@@ -54,14 +60,15 @@ class Service(Product):
         Update a product by its primary key (pk).
         """
         product = Product.get(pk)
-        update_data = update_product.dict(exclude_unset=True)
+        update_data = update_product.model_dump(exclude_unset=True)
 
         product.update(**update_data)
 
         product.save()
 
-        await FastAPICache.clear(namespace="inventory.products")
+        # await FastAPICache.clear(namespace="inventory.products")
         await clear_cache_by_pk(pk=pk, namespace="inventory.product")
+        await clear_cache_by_namespace(namespace="inventory.products")
 
         return product
 
@@ -70,12 +77,13 @@ class Service(Product):
         Delete a product by its primary key (pk).
         """
         product = Product.get(pk)
-        product_dict = product.dict()
+        product_dict = product.model_dump()
 
         Product.delete(product.pk)
 
         # After deleting, clear the cache for this product
-        await FastAPICache.clear(namespace="inventory.products")
+        # await FastAPICache.clear(namespace="inventory.products")
+        await clear_cache_by_namespace(namespace="inventory.products")
         await clear_cache_by_pk(pk=pk, namespace="inventory.product")
 
         return product_dict
