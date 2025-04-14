@@ -32,8 +32,8 @@ export const Products = () => {
                   <thead>
                     <tr>
                       <th scope="col">#</th>
-                      <th scope="col">Name</th>
-                      <th scope="col">Price</th>
+                      <th scope="col">Product Name</th>
+                      <th scope="col">Unit Price</th>
                       <th scope="col">Quantity</th>
                       <th scope="col">Creation Time</th>
                       <th scope="col">Actions</th>
@@ -46,7 +46,14 @@ export const Products = () => {
                       <td>{product.name}</td>
                       <td>{product.price}</td>
                       <td>{product.quantity}</td>
-                      <td>{product.creation_time}</td>
+                      <td>{new Date(product.creation_time).toLocaleString('en-US', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                      })}</td>
                       <td>
                         <a href="#" className="btn btn-sm btn-outline-danger"
                           onClick={e => del(product.id)}
