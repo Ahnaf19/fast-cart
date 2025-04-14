@@ -25,7 +25,7 @@ export const Products = () => {
 
     return  <Wrapper>
               <div style={{marginTop: "20px"}}>
-                <Link to={`/create`} className="btn btn-sm btn-outline-secondary">Add</Link>
+                <Link to={`/create`} className="btn btn-sm btn-outline-success">Add</Link>
               </div>
               <div className="table-responsive small mt-4">
                 <table className="table table-striped table-sm">
@@ -46,7 +46,7 @@ export const Products = () => {
                       <td>{product.price}</td>
                       <td>{product.quantity}</td>
                       <td>
-                        <a href="#" className="btn btn-sm btn-outline-secondary"
+                        <a href="#" className="btn btn-sm btn-outline-danger"
                           onClick={e => del(product.id)}
                         >
                           Delete</a>
