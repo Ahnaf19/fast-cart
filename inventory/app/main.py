@@ -10,7 +10,13 @@ from inventory.app.routes.route import router
 
 # Create an instance of the FastAPI application
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Allow only your frontend URL
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],  # Explicitly allow OPTIONS for preflight checks
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Initialize a variable to store the redis_cache instance
 redis_cache = None

@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from loguru import logger
 from starlette.requests import Request
 from starlette.responses import Response
@@ -53,15 +54,18 @@ async def clear_cache_by_namespace(namespace: str) -> None:
     prefix = FastAPICache.get_prefix()
     cache_backend = FastAPICache.get_backend()
 
-    if namespace == "":
-        cache_key = f"{prefix}"
-    else:
-        cache_key = f"{prefix}:{namespace}"
+    if not isinstance(cache_backend, RedisBackend):
+        raise TypeError("Cache backend is not RedisBackend. Pattern clearing only supported for Redis.")
 
-    logger.debug(f"Clearing cache for key: {cache_key}")
+    # Construct pattern based on prefix and namespace
+    pattern = f"{prefix}:{namespace}*"
 
-    # https://github.com/long2ice/fastapi-cache/blob/main/fastapi_cache/backends/redis.py
-    await cache_backend.clear(key=cache_key)
+    logger.debug(f"Clearing cache with pattern: {pattern}")
+
+    # Scan and delete all keys matching the pattern
+    async for key in cache_backend.redis.scan_iter(match=pattern):  # type: ignore
+        logger.debug(f"Deleting cache key: {key}")
+        await cache_backend.redis.delete(key)  # type: ignore
 
 
 async def clear_cache_by_pk(pk: str, namespace: str = "") -> None:
