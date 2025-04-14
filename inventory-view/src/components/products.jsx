@@ -13,6 +13,16 @@ export const Products = () => {
         setProducts(content)
       }) ()
     }, [])
+
+    const del = async id => {
+      if(window.confirm("Are you sure to delete this record?")) {
+          await fetch(`http://localhost:8000/inventory/product/${id}`, {
+            method: 'DELETE'
+          })
+          setProducts(products.filter(product => product.id !== id))
+      }
+    }
+
     return  <Wrapper>
               <div style={{marginTop: "20px"}}>
                 <Link to={`/create`} className="btn btn-sm btn-outline-secondary">Add</Link>
@@ -36,7 +46,10 @@ export const Products = () => {
                       <td>{product.price}</td>
                       <td>{product.quantity}</td>
                       <td>
-                        <a href="#" className="btn btn-sm btn-outline-secondary">Delete</a>
+                        <a href="#" className="btn btn-sm btn-outline-secondary"
+                          onClick={e => del(product.id)}
+                        >
+                          Delete</a>
                       </td>
                     </tr>
                     })}
