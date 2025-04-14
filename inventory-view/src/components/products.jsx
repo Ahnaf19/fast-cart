@@ -35,6 +35,7 @@ export const Products = () => {
                       <th scope="col">Name</th>
                       <th scope="col">Price</th>
                       <th scope="col">Quantity</th>
+                      <th scope="col">Creation Time</th>
                       <th scope="col">Actions</th>
                     </tr>
                   </thead>
@@ -45,6 +46,7 @@ export const Products = () => {
                       <td>{product.name}</td>
                       <td>{product.price}</td>
                       <td>{product.quantity}</td>
+                      <td>{product.creation_time}</td>
                       <td>
                         <a href="#" className="btn btn-sm btn-outline-danger"
                           onClick={e => del(product.id)}
