@@ -104,7 +104,7 @@ Ensure you have Docker installed on your machine. You can download it from [here
 Navigate to the root directory of the repo where the `Dockerfile` is located and run the following command to build the Docker image:
 
 ```sh
-docker build -t <fastcart>:latest .
+docker build -t fastcart:latest .
 ```
 
 #### Run Docker Container
