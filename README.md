@@ -7,17 +7,50 @@
 The project is designed to consist of two microservices:
 
 1. **Inventory Service**:
-   This service will manage product inventory, including stock levels, product details, and updates. It will interact with a redis database for storage.
-
-   > future plan is to interact with a SQL database for persistent storage and Redis for caching frequently accessed data.
+   This service manages product inventory, including stock levels, product details, and updates. It interacts with a redis database for storage, using redis for caching as well.
 
 2. **Payment Service**:
-   This service will handle payment processing, order validation, and transaction management. It will also interact with the Inventory Service to validate stock availability before processing payments.
+   This service handles payment processing, order validation, and transaction management, stored in postgresql. It also interacts with the Inventory Service to validate stock availability before processing payments. It also uses redis for caching as well.
+
+3. **Inventory Frontend**
+   This service provides a user interface for managing inventory. It allows users to:
+
+   - View product details and stock levels.
+   - Add, update, or delete products.
+   - Monitor inventory changes in real-time.
+
+   The frontend is built using **React** for a responsive and dynamic user experience. It communicates with the Inventory Service via RESTful APIs to fetch and update data.
+
+   ### Setup Instructions
+
+   1. Navigate to the `inventory-frontend` directory.
+   2. Install dependencies:
+
+   ```sh
+   npm install
+   ```
+
+   3. Start the development server:
+
+   ```sh
+   npm run dev
+   ```
+
+   4. Access the application at `http://localhost:3000`.
+
+4. **Payment Frontend**
+
+   > in progress
+
+5. **Event Driven Architecture**
+
+   Event-driven architecture enables seamless communication between the Payment and Inventory services using Redis Streams. When a payment is processed, the Payment Service publishes an event to a Redis stream. The Inventory Service subscribes to this stream, listens for payment events, and updates stock levels accordingly. This decoupled approach ensures scalability, real-time updates, and fault tolerance in the system. Also makes it easier to catch rare edge cases.
 
 ### Key Technologies
 
 - **FastAPI**: For building high-performance APIs with Python.
 - **Redis**: For caching and message brokering between microservices.
+- **Redis Stream**: Used for event driven architecture.
 - **SQL Database**: For persistent storage of inventory and payment data.
 - **Docker**: For containerizing the microservices for easy deployment and scalability.
 - **GitHub Actions**: For CI/CD pipelines to ensure code quality and automated testing.
@@ -25,14 +58,14 @@ The project is designed to consist of two microservices:
 
 ### Microservice Interaction
 
-The two microservices will communicate with each other using RESTful APIs with `FastAPI`. `Redis` will be used as a message broker for asynchronous tasks, such as updating inventory after a successful payment.
+The two microservices will communicate with each other using RESTful APIs with `FastAPI`. `Redis` will be used as a message broker for asynchronous tasks, such as updating inventory after a successful payment: part of event driven architecture.
 
 ### Future Enhancements
 
-- Use SQL for persistant storage and redis for caching.
-- Add authentication and authorization mechanisms.
-- Implement monitoring and logging for better observability.
-- Explore deployment options such as Kubernetes for scaling the microservices.
+[x] Use SQL for persistant storage and redis for caching.
+[ ] Add authentication and authorization mechanisms.
+[x] Implement monitoring and logging for better observability.
+[ ] Explore deployment options such as Kubernetes for scaling the microservices.
 
 This project aims to serve as a robust starting point for building scalable and maintainable microservices with Python.
 
@@ -71,7 +104,7 @@ Ensure you have Docker installed on your machine. You can download it from [here
 Navigate to the root directory of the repo where the `Dockerfile` is located and run the following command to build the Docker image:
 
 ```sh
-docker build -t <project_name>:latest .
+docker build -t <fastcart>:latest .
 ```
 
 #### Run Docker Container
@@ -79,13 +112,13 @@ docker build -t <project_name>:latest .
 After building the Docker image, you can run it using the following command:
 
 ```sh
-docker run -dp 8000:8000 <project_name>:latest
+docker run -dp 8000:8000 <fastcart>:latest
 ```
 
 or give the container a name:
 
 ```sh
-docker run -dp 8000:8000 --name <project_name>-latest <project_name>:latest
+docker run -dp 8000:8000 --name <fastcart>-latest <fastcart>:latest
 ```
 
 This will start the application in a Docker container. The application can be accessed at `http://localhost:8000` e.g. `127.0.0.1:8000`
@@ -111,6 +144,8 @@ docker stop <container_id>
 
 ## Run locally with Uvicorn
 
+> this part is yet to be updated with repo structure
+
 - [optional but recommended] create a venv and activate it
 - Install dependencies:
   ```sh
@@ -127,14 +162,14 @@ docker stop <container_id>
 ## Milestones
 
 - [x] develop inventory api 🤖
-- [ ] develop payment api ✨
-- [ ] Interact between the microservices 🌐
+- [x] develop payment api ✨
+- [x] Interact between the microservices 🌐
 - [ ] unit testing 🧪
 - [ ] write comprehensive readme 📖
 - [ ] write readme-dev 📖
 - [ ] dockerize the repo 🐳
 - [x] Code Auto-formatting & Linting with Pre-commit (check-yaml, end-of-file-fixer, trailing-whitespace, black, isort, mypy, flake8, bandit) 🎨
-- [ ] add GitHub Action for format checks ✅
+- [x] add GitHub Action for format checks ✅
 - [ ] Study deploy requirement and deploy! 🚀
 
 ---
