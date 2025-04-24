@@ -55,10 +55,10 @@ export const Products = () => {
                         hour12: true
                       })}</td>
                       <td>
-                        <a href="#" className="btn btn-sm btn-outline-danger"
-                          onClick={e => del(product.id)}
+                        <button type="button" className="btn btn-sm btn-outline-danger"
+                          onClick={() => del(product.id)}
                         >
-                          Delete</a>
+                          Delete</button>
                       </td>
                     </tr>
                     })}
