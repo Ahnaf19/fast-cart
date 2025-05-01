@@ -4,7 +4,7 @@ bandit==1.8.3
 black==25.1.0
 flake8==7.1.2
 # testing libraries
-httpx==0.27.2
+httpx==0.28.1
 isort==6.0.1
 mypy==1.15.0
 pre-commit==4.2.0
