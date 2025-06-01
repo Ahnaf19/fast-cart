@@ -10,5 +10,5 @@ redis-om==0.3.5
 requests==2.32.3
 sqlalchemy==2.0.40
 sqlmodel==0.0.24
-types-requests==2.32.0.20250328
+types-requests==2.32.0.20250515
 uvicorn==0.34.0
