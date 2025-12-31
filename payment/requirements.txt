@@ -2,10 +2,10 @@ asyncpg==0.30.0
 fastapi==0.115.12
 loguru==0.7.3
 psycopg2==2.9.10
-pydantic==2.11.1
+pydantic==2.11.9
 python-dotenv==1.1.0
 requests==2.32.3
 sqlalchemy==2.0.40
 sqlmodel==0.0.24
-types-requests==2.32.4.20250913
-uvicorn==0.34.0
+types-requests==2.32.0.20250328
+uvicorn==0.37.0
