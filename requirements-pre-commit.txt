@@ -1,5 +1,5 @@
 # pre-commit libraries
-bandit==1.8.3
+bandit==1.9.2
 black==25.1.0
 flake8==7.1.2
 isort==6.0.1
